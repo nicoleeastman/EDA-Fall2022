@@ -1,0 +1,53 @@
+---
+title: "Assignment01"
+author: "Nicole Eastman"
+date: "8/30/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<<<<<<< HEAD
+### My Git settings:
+user.name=nicoleeastman
+
+git remote -v
+user.name=nicoleeastman
+
+### My Git changes:
+49a896d (HEAD -> main, origin/main, origin/HEAD) Assignment01
+eb5593f final edits
+fe4b69f edits
+8759b9d Update Untitled
+82e1e90 second text file
+bacba00 Second text file edit test
+13c44d4 Text File Demo
+04dc4a2 Add new GitDemo file
+20a7b70 (upstream/main) Add data files
+f992081 Create Assignments folder
+972c063 Create Lessons folder
+34b6cc8 Create .gitignore
+a07d95c Initial commit
+=======
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+>>>>>>> 49a896d (Assignment01)
