@@ -26,65 +26,72 @@ The completed exercise is due on Sept 30th.
 
 ```{r,  message = FALSE}
 setwd("/home/guest/R/EDA Fall 2022")
+getwd()
 library(tidyverse)
 ECOTOX.insects.data <- read.csv("./Data/Raw/ECOTOX_Neonicotinoids_Insects_raw.csv", stringsAsFactors = TRUE)
+NEON.litter.debris.data <- read.csv("./Data/Raw/NEON_NIWO_Litter_massdata_2018-08_raw.csv", stringsAsFactors = TRUE)
+
 ```
 
 ## Learn about your system
 
 2.  The neonicotinoid dataset was collected from the Environmental Protection Agency's ECOTOX Knowledgebase, a database for ecotoxicology research. Neonicotinoids are a class of insecticides used widely in agriculture. The dataset that has been pulled includes all studies published on insects. Why might we be interested in the ecotoxicology of neonicotinoids on insects? Feel free to do a brief internet search if you feel you need more background information.
 
-> Answer:
+> Answer: Scientists may be interested in this dataset representing the ecotoxicology of neonicotinoids on insects because it will assist in evaluating which substance is effective in killing insects that may be harming agriculutral products. This information can inform farmers on which neonicotinoids to use on their farms.
 
 3.  The Niwot Ridge litter and woody debris dataset was collected from the National Ecological Observatory Network, which collectively includes 81 aquatic and terrestrial sites across 20 ecoclimatic domains. 32 of these sites sample forest litter and woody debris, and we will focus on the Niwot Ridge long-term ecological research (LTER) station in Colorado. Why might we be interested in studying litter and woody debris that falls to the ground in forests? Feel free to do a brief internet search if you feel you need more background information.
 
-> Answer:
+> Answer: We would be interested in studying litter and woody debris on the forest floor because it serves as habitat for insects living in that ecosystem. Therefore, we can assess available habitat and food sources for insects. This organic matter also contributes to the nutrient cycle and carbon budgets.
 
 4.  How is litter and woody debris sampled as part of the NEON network? Read the NEON_Litterfall_UserGuide.pdf document to learn more. List three pieces of salient information about the sampling methods here:
 
 > Answer: 
- 1.
- 2.
- 3. 
+ 1.The sampling of litter and fine woody debris occurs in tower plots. The sites with forested tower airsheds sample in 20 40mx40m plots while the sites with low-statured vegetation are sampled in 4 40mx40m and 26 20mx20m plots.
+ 2. Each plot has 1-4 trap pairs with one elevated trap and one ground trap in each pair. They are deployed in every 400m^2 of plot area.
+ 3. One time each year, ground traps are sampled; contrastingly, elevated traps are sampled once bi-weekly in decidusous forest sites during senescence and once every 1 to 2 months year-long in coniferous forest sties.
 
 ## Obtain basic summaries of your data (Neonics)
 
 5.  What are the dimensions of the dataset?
 
 ```{r}
+dim(ECOTOX.insects.data)
 
 ```
 
 6.  Using the `summary` function on the "Effect" column, determine the most common effects that are studied. Why might these effects specifically be of interest?
 
 ```{r}
+summary(ECOTOX.insects.data$Effect)
 
 ```
 
-> Answer:
+> Answer: The most common effect is population with a value of 1803. This may be the result of the experiment being conducted on a group of insects of the same species at the same time and place. This effect is of interest because it is important to know what type of insect species had a given reaction to the chemical application. Additionally, mortality was a frquent effect which had a count of 1493, meaning the application of the chemical resulted in death of the insect. This is an important effect to evaluate because the goal of the study is to assess which chemicals are effective in killing insects. 
 
 7.  Using the `summary` function, determine the six most commonly studied species in the dataset (common name). What do these species have in common, and why might they be of interest over other insects? Feel free to do a brief internet search for more information if needed.
 
 ```{r}
+summary(ECOTOX.insects.data$Species.Common.Name)
 
 ```
 
-> Answer:
+> Answer: The six most commonly studied insects in this study include Honey Bees, Parisitic Wasps, Buff Tailed Honeybees, Carniolan Honey Bees, Bumble Bees, and Italian Honey Bees. All of these species are types of bees which may be of interest because they tend to be species you want for pollination purposes. If these species die in response to the insecticide, the farmer may want to chose a different chemical.
 
 8.  Concentrations are always a numeric value. What is the class of Conc.1..Author. in the dataset, and why is it not numeric?
 
 ```{r}
+class(ECOTOX.insects.data$Conc.1..Author.)
 
 ```
 
-> Answer:
+> Answer: The class of Conc.1..Author is a factor because it represents levels or categories of concentrations rather than individual numeric values for each row. 
 
 ## Explore your data graphically (Neonics)
 
 9.  Using `geom_freqpoly`, generate a plot of the number of studies conducted by publication year.
 
 ```{r}
-
+geo
 ```
 
 10. Reproduce the same graph but now add a color aesthetic so that different Test.Location are displayed as different colors.
