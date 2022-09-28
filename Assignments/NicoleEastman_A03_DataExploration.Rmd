@@ -30,6 +30,8 @@ getwd()
 library(tidyverse)
 ECOTOX.insects.data <- read.csv("./Data/Raw/ECOTOX_Neonicotinoids_Insects_raw.csv", stringsAsFactors = TRUE)
 NEON.litter.debris.data <- read.csv("./Data/Raw/NEON_NIWO_Litter_massdata_2018-08_raw.csv", stringsAsFactors = TRUE)
+Neonics <- ECOTOX.insects.data
+Litter <- NEON.litter.debris.data
 
 ```
 
@@ -55,14 +57,14 @@ NEON.litter.debris.data <- read.csv("./Data/Raw/NEON_NIWO_Litter_massdata_2018-0
 5.  What are the dimensions of the dataset?
 
 ```{r}
-dim(ECOTOX.insects.data)
+dim(Neonics)
 
 ```
 
 6.  Using the `summary` function on the "Effect" column, determine the most common effects that are studied. Why might these effects specifically be of interest?
 
 ```{r}
-summary(ECOTOX.insects.data$Effect)
+summary(Neonics$Effect)
 
 ```
 
@@ -71,7 +73,7 @@ summary(ECOTOX.insects.data$Effect)
 7.  Using the `summary` function, determine the six most commonly studied species in the dataset (common name). What do these species have in common, and why might they be of interest over other insects? Feel free to do a brief internet search for more information if needed.
 
 ```{r}
-summary(ECOTOX.insects.data$Species.Common.Name)
+summary(Neonics$Species.Common.Name)
 
 ```
 
@@ -80,7 +82,7 @@ summary(ECOTOX.insects.data$Species.Common.Name)
 8.  Concentrations are always a numeric value. What is the class of Conc.1..Author. in the dataset, and why is it not numeric?
 
 ```{r}
-class(ECOTOX.insects.data$Conc.1..Author.)
+class(Neonics$Conc.1..Author.)
 
 ```
 
@@ -91,12 +93,14 @@ class(ECOTOX.insects.data$Conc.1..Author.)
 9.  Using `geom_freqpoly`, generate a plot of the number of studies conducted by publication year.
 
 ```{r}
-geo
+ggplot(Neonics) + geom_freqpoly(aes(x = Publication.Year), bins=50)
+
 ```
 
 10. Reproduce the same graph but now add a color aesthetic so that different Test.Location are displayed as different colors.
 
 ```{r}
+ggplot(Neonics) + geom_freqpoly(aes(x = Publication.Year), bins=50) + geom_freqpoly(aes(x = Test.Location), bins=50, color = "blue")
 
 ```
 
@@ -107,16 +111,20 @@ Interpret this graph. What are the most common test locations, and do they diffe
 11. Create a bar graph of Endpoint counts. What are the two most common end points, and how are they defined? Consult the ECOTOX_CodeAppendix for more information.
 
 ```{r}
+ggplot(Neonics, aes(x=Endpoint))+ geom_bar() + theme(axis.text.x=element_text(angle=90))
 
 ```
 
-> Answer:
-
+> Answer: The  most common endpoint is NOEL meaning the no-observable-effect-level. This is defined as the highest concentration that produces an effect that is not significantly different from the responses of the control. LOEL has the second greatest count and is defined as the lowest-observable-effect-level which means the lowest concentration that produces effects that are different from the lowest-observable-effect concentration control.
+ 
 ## Explore your data (Litter)
 
 12. Determine the class of collectDate. Is it a date? If not, change to a date and confirm the new class of the variable. Using the `unique` function, determine which dates litter was sampled in August 2018.
 
 ```{r}
+class(Litter$collectDate) 
+Litter$collectDate <- as.Date(Litter$collectDate, format="%m %d %y")
+
 
 ```
 
@@ -131,19 +139,22 @@ Interpret this graph. What are the most common test locations, and do they diffe
 14. Create a bar graph of functionalGroup counts. This shows you what type of litter is collected at the Niwot Ridge sites. Notice that litter types are fairly equally distributed across the Niwot Ridge sites.
 
 ```{r}
+ggplot(Litter, aes(x=functionalGroup))+ geom_bar()
 
 ```
 
 15. Using `geom_boxplot` and `geom_violin`, create a boxplot and a violin plot of dryMass by functionalGroup.
 
 ```{r}
+ggplot(Litter) + geom_boxplot(aes(x=dryMass, y=functionalGroup))
+ggplot(Litter) + geom_violin(aes(x=dryMass, y=functionalGroup), draw_quantiles= c(0.25,0.5,0.75))
 
 ```
 
 Why is the boxplot a more effective visualization option than the violin plot in this case?
 
-> Answer:
+> Answer: The bloxpot is a more effective visualization because it shows the freauency of dryMass in addition to just the range of values. The median and quartiles are shown which indicate where 75% of the data for each functionalGroup occurs. 
 
 What type(s) of litter tend to have the highest biomass at these sites?
 
-> Answer:
+> Answer:Needles tend to have the highest biomass at this site with the greatest median, range, and outlier.
