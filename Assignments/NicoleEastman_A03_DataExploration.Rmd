@@ -100,13 +100,13 @@ ggplot(Neonics) + geom_freqpoly(aes(x = Publication.Year), bins=50)
 10. Reproduce the same graph but now add a color aesthetic so that different Test.Location are displayed as different colors.
 
 ```{r}
-ggplot(Neonics) + geom_freqpoly(aes(x = Publication.Year), bins=50) + geom_freqpoly(aes(x = Test.Location), bins=50, color = "blue")
+ggplot(Neonics) + geom_freqpoly(aes(x = Publication.Year, color = Test.Location), bins = 25)
 
 ```
 
 Interpret this graph. What are the most common test locations, and do they differ over time?
 
-> Answer:
+> Answer:The most common test locations are in labs and the natural field. The testing frequency begins to increase in the 1990s and peaks around 2013-2014.
 
 11. Create a bar graph of Endpoint counts. What are the two most common end points, and how are they defined? Consult the ECOTOX_CodeAppendix for more information.
 
@@ -125,6 +125,7 @@ ggplot(Neonics, aes(x=Endpoint))+ geom_bar() + theme(axis.text.x=element_text(an
 class(Litter$collectDate) 
 Litter$collectDate <- as.Date(Litter$collectDate, format="%m %d %y")
 
+Litter.09.2018 <- unique(Litter$collectDate == "2018-08-06")
 
 ```
 
