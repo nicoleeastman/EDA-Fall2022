@@ -34,6 +34,12 @@ Neonics <- ECOTOX.insects.data
 Litter <- NEON.litter.debris.data
 
 ```
+```{r setup, include=FALSE}
+install.packages('formatR')
+knitr::opts_chunk$set(tidy.opts=list(width.cutoff=80), tidy=TRUE)
+
+```
+
 
 ## Learn about your system
 
@@ -123,19 +129,20 @@ ggplot(Neonics, aes(x=Endpoint))+ geom_bar() + theme(axis.text.x=element_text(an
 
 ```{r}
 class(Litter$collectDate) 
-Litter$collectDate <- as.Date(Litter$collectDate, format="%m %d %y")
+Litter$collectDate <- as.Date(Litter$collectDate, format="%Y-%m-%d")
 
-Litter.09.2018 <- unique(Litter$collectDate == "2018-08-06")
+unique(Litter$collectDate)
 
 ```
 
 13. Using the `unique` function, determine how many plots were sampled at Niwot Ridge. How is the information obtained from `unique` different from that obtained from `summary`?
 
 ```{r}
+unique(Litter$namedLocation)
 
 ```
 
-> Answer:
+> Answer: 12 different plots were sampked at Niwot Ridge. 'Unique' differs from 'summary' because it identifies each unique value in a row and categorizes it by the amount of duplicates for each value. Meanwhile, summary lists every value present in a row and the count for each value. 
 
 14. Create a bar graph of functionalGroup counts. This shows you what type of litter is collected at the Niwot Ridge sites. Notice that litter types are fairly equally distributed across the Niwot Ridge sites.
 
