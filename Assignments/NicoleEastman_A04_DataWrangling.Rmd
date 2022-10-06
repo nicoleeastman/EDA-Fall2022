@@ -37,6 +37,10 @@ setwd("/home/guest/R/EDA Fall 2022")
 getwd()
 library(tidyverse)
 library(lubridate)
+EPAair1 <- read.csv("Data/Raw/EPAair_O3_NC2018_raw.csv", stringsAsFactors = TRUE)
+EPAair2 <- read.csv("Data/Raw/EPAair_O3_NC2019_raw.csv", stringsAsFactors= TRUE)
+EPAair3 <- read.csv("Data/Raw/EPAair_PM25_NC2018_raw.csv", stringsAsFactors = TRUE)
+EPAair4 <- read.csv("Data/Raw/EPAair_PM25_NC2019_raw.csv", stringsAsFactors = TRUE)
 
 #2
 ```
