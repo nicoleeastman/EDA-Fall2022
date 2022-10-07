@@ -74,11 +74,27 @@ EPAair3$Date <- as.Date(EPAair3$Date, format = "%m/%d/%Y")
 EPAair4$Date <- as.Date(EPAair4$Date, format = "%m/%d/%Y")
 
 #4
-select()
+EPA1.processed <- EPAair1 %>% select(Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
+
+EPA2.processed <- EPAair2 %>% select(Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
+
+EPA3.processed <- EPAair3 %>% select(Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
+
+EPA4.processed <- EPAair4 %>% select(Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
 
 #5
+EPA3.processed$AQS_PARAMETER_DESC<- "PM2.5"
+
+EPA4.processed$AQS_PARAMETER_DESC<- "PM2.5"
 
 #6
+write.csv(EPA1.processed, file ="Data/Processed/EPAair_O3_NC2018_processed.csv", row.names= FALSE)
+
+write.csv(EPA2.processed, file ="Data/Processed/EPAair_O3_NC2019_processed.csv", row.names= FALSE)
+
+write.csv(EPA3.processed, file ="Data/Processed/EPAair_PM25_NC2018_processed.csv", row.names= FALSE)
+
+write.csv(EPA4.processed, file ="Data/Processed/EPAair_PM25_NC2019_processed.csv", row.names= FALSE)
 
 ```
 
@@ -98,14 +114,26 @@ select()
 
 ```{r}
 #7
+EPA.combined <- rbind(EPA1.processed, EPA2.processed, EPA3.processed, EPA4.processed)
 
 #8
+EPA.filtered <- EPA.combined %>%
+  filter(EPA.combined$Site.Name %in% c("Linville Falls", "Durham Armory", "Leggett", "Hattie Avenue", "Clemmons Middle", "Mendenhall School", "Frying Pan Mountain", "West Johnston Co.", "Garinger High School", "Castle Hayne", "Pitt Agri. Center", "Bryson City", "Millbrook School")) %>%
+  group_by(Date, Site.Name, AQS_PARAMETER_DESC, COUNTY) %>%
+  filter(!is.na(DAILY_AQI_VALUE) & !is.na(SITE_LATITUDE) & !is.na(SITE_LONGITUDE)) %>%
+  summarize(meanAQI = mean(DAILY_AQI_VALUE),
+            meanLat= mean(SITE_LATITUDE),
+            meanLong = mean(SITE_LONGITUDE)) %>%
+  mutate(Month = month(Date), Year = year(Date)) 
 
 #9
+EPA.final <- separate(EPA.filtered, AQS_PARAMETER_DESC, c("PM2.5", "Ozone"))
 
 #10
+dim(EPA.final)
 
 #11
+write.csv(EPA.final, file ="Data/Processed/EPAair_O3_PM25_NC1718_Processed.csv", row.names= FALSE)
 
 ```
 
