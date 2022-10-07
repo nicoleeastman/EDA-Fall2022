@@ -145,15 +145,18 @@ write.csv(EPA.final, file ="Data/Processed/EPAair_O3_PM25_NC1819_Processed.csv",
 
 ```{r}
 #12a and b
-class(EPA.final$`PM2.5 - Local Conditions`)
+class(EPA.final$`Ozone`)
 
 EPA.summaries <- EPA.final %>%
   group_by(Site.Name, Month, Year) %>%
-  summarize(meanPM2.5= mean('PM2.5 - Local Conditions'),
+  summarize(meanPM2.5= mean(PM2.5),
             meanOzone = mean(Ozone))
 
 #12b
-
+EPA.final.summary <- 
+  EPA.summaries %>%
+  drop_na(meanPM2.5) %>%
+  drop_na(meanOzone)
 
 
 #13
@@ -163,4 +166,4 @@ dim(EPA.summaries)
 
 14. Why did we use the function `drop_na` rather than `na.omit`?
 
-> Answer: 
+> Answer: 'Drop_na' allows you to select the specific columns that contain the rows with N/As you would like to remove. 'na.omit' deletes the rows with N/As located in all of the columns in the dataframe.
