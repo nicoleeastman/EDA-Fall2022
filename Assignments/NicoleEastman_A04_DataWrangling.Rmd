@@ -127,28 +127,37 @@ EPA.filtered <- EPA.combined %>%
   mutate(Month = month(Date), Year = year(Date)) 
 
 #9
-EPA.final <- separate(EPA.filtered, AQS_PARAMETER_DESC, c("PM2.5", "Ozone"))
+EPA.final <- pivot_wider(EPA.filtered, names_from = AQS_PARAMETER_DESC, values_from = meanAQI)
 
 #10
 dim(EPA.final)
 
 #11
-write.csv(EPA.final, file ="Data/Processed/EPAair_O3_PM25_NC1718_Processed.csv", row.names= FALSE)
+write.csv(EPA.final, file ="Data/Processed/EPAair_O3_PM25_NC1819_Processed.csv", row.names= FALSE)
 
 ```
 
 
 ## Generate summary tables
-12. Use the split-apply-combine strategy to generate a summary data frame. Data should be grouped by site, month, and year. Generate the mean AQI values for ozone and PM2.5 for each group. Then, add a pipe to remove instances where a month and year are not available (use the function `drop_na` in your pipe). 
+12. Use the split-apply-combine strategy to generate a summary data frame. Data should be grouped by site, month, and year. Generate the mean AQI values for ozone and PM2.5 for each group. Then, add a pipe to remove instances where neither ozone nor PM2.5 have values (use the function `drop_na` in your pipe). 
 
 13. Call up the dimensions of the summary dataset.
 
 ```{r}
-#12a
+#12a and b
+class(EPA.final$`PM2.5 - Local Conditions`)
+
+EPA.summaries <- EPA.final %>%
+  group_by(Site.Name, Month, Year) %>%
+  summarize(meanPM2.5= mean('PM2.5 - Local Conditions'),
+            meanOzone = mean(Ozone))
 
 #12b
 
+
+
 #13
+dim(EPA.summaries)
 
 ```
 
