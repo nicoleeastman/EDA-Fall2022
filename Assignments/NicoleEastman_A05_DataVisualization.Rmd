@@ -1,6 +1,6 @@
 ---
 title: "Assignment 5: Data Visualization"
-author: "Student Name"
+author: "Nicole Eastman"
 output: pdf_document
 geometry: margin=2.54cm
 ---
@@ -9,7 +9,7 @@ geometry: margin=2.54cm
 #This code chunk will tidy your knit PDF files, wrapping long code lines
 #For it to work, the "formatR" package needs to be installed
 
-#install.packages('formatR')
+install.packages('formatR')
 knitr::opts_chunk$set(tidy.opts=list(width.cutoff=80), tidy=TRUE)
 ```
 
@@ -39,16 +39,24 @@ the processed data file for the Niwot Ridge litter dataset (use the
 2. Make sure R is reading dates as date format; if not change the format to date.
 
 ```{r}
-#1 
+#1 Set-up
+setwd("/home/guest/R/EDA Fall 2022")
+library(tidyverse)
+library(lubridate)
+library(cowplot)
+PP.Nutrients<- read.csv("Data/Processed/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv")
+Niwot.Litter<- read.csv("Data/Processed/NEON_NIWO_Litter_mass_trap_Processed.csv")
 
-#2 
+#2 Date Format
+PP.Nutrients$sampledate <- as.Date(PP.Nutrients$sampledate, "%Y-%m-%d")
+Niwot.Litter$collectDate <- as.Date(Niwot.Litter$collectDate, "%Y-%m-%d")
 
 ```
 ## Define your theme
 3. Build a theme and set it as your default theme.
 
 ```{r}
-#3
+#3 Theme
 
 ```
 
