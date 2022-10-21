@@ -96,12 +96,13 @@ see <https://r-lang.com/month-abb-in-r-with-example>
 
 ```{r}
 #5a Boxplot Construction
+PP.Nutrients$month<- factor(PP.Nutrients$month, levels=c(1:12))
 Box.Temp <- 
   ggplot(PP.Nutrients, aes(x= (month.abb[month]), y= temperature_C, color= lakename)) +
            geom_boxplot() +
-  factor(month, levels=c(1:12)) +
            scale_x_discrete(drop=FALSE) +
-  labs(x="Month", y = "Temperature (C)")
+  labs(x="Month", y = "Temperature (C)") +
+  scale_x_date(limits= as.Date(c("1", "12")))
 print(Box.Temp)
 
 #5b
@@ -140,12 +141,25 @@ three facets rather than separated by color.
 
 ```{r}
 #6 Subset of Litter Dataset: "Needles"
-
+Needles.Plot <-
+  ggplot(filter(Niwot.Litter, functionalGroup == "Needles"), aes(x= collectDate, y= dryMass, color= nlcdClass)) +
+           geom_point() + 
+  labs(x= "Date", y= "Mass") +
+scale_fill_discrete(name= "NLCD Class", labels= "Evergreen Forest", "Grassland Herbaceuous", "Shrub Scrub" ) +
+  scale_x_date(limits= as.Date(c("2016-06-16", "2019-09-25")),
+                date_breaks= "3 months", date_labels = "%b %y") +
+  theme(axis.text.x = element_text(angle=90))
+print(Needles.Plot)
 
 #7
-
+Needles.faceted.plot <- 
+  ggplot(filter(Niwot.Litter, functionalGroup== "Needles"), aes(x= collectDate, y= dryMass)) +
+  geom_point() +
+  facet_wrap(vars(nlcdClass), nrow=3) +
+  labs(x= "Date", y= "Mass")
+print(Needles.faceted.plot)
 
 ```
 Question: Which of these plots (6 vs. 7) do you think is more effective, and why? 
 
-> Answer:
+> Answer: I think the faceted graph is more effective because it is easier to visualize the different mass values over the years for each given category when they are separated. It is difficult to see trends with the "busy" colored dots in #6.
