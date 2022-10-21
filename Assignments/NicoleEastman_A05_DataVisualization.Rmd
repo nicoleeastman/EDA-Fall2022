@@ -96,10 +96,12 @@ see <https://r-lang.com/month-abb-in-r-with-example>
 
 ```{r}
 #5a Boxplot Construction
-Box.Temp <-
-  ggplot(PP.Nutrients, aes(x= (month.abb[month]), y= temperature_C)) +
-  geom_boxplot(aes(color= lakename)) +
-  labs(x= 'Month', y= "Temperature (C)")
+Box.Temp <- 
+  ggplot(PP.Nutrients, aes(x= (month.abb[month]), y= temperature_C, color= lakename)) +
+           geom_boxplot() +
+  factor(month, levels=c(1:12)) +
+           scale_x_discrete(drop=FALSE) +
+  labs(x="Month", y = "Temperature (C)")
 print(Box.Temp)
 
 #5b
@@ -118,7 +120,7 @@ print(Box.TN)
 
 #5d Cowplot
 Nutrients.Cowplot <- 
-  plot_grid(Box.Temp, Box.TP, Box.TN, labels= c('Temp', 'TP', 'TN'))
+  plot_grid(Box.Temp, Box.TP, Box.TN, labels= c('Temp', 'TP', 'TN'), common.legend= TRUE)
 print(Nutrients.Cowplot)
 
 ```
@@ -137,7 +139,8 @@ of each land use)
 three facets rather than separated by color. 
 
 ```{r}
-#6
+#6 Subset of Litter Dataset: "Needles"
+
 
 #7
 
