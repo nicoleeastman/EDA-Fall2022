@@ -99,36 +99,35 @@ see <https://r-lang.com/month-abb-in-r-with-example>
 #5a Boxplot Construction
 PP.Nutrients$month<- factor(PP.Nutrients$month, levels=c(1:12))
 Box.Temp <- 
-  ggplot(PP.Nutrients, aes(x= (month.abb[month]), y= temperature_C, color= lakename)) +
+  ggplot(PP.Nutrients, aes(x= month, y= temperature_C, color= lakename)) +
            geom_boxplot() +
-           scale_x_discrete(drop=FALSE) +
-  labs(x="Month", y = "Temperature (C)") +
-  theme(legend.position = "none")
+   scale_x_discrete(drop = FALSE) +
+  labs(x="Month", y = "Temperature (C)")
 print(Box.Temp)
 
 #5b
-Box.TP <- ggplot(PP.Nutrients, aes(x= (month.abb[month]), y= tp_ug)) +
+Box.TP <- ggplot(PP.Nutrients, aes(x= month, y= tp_ug)) +
   geom_boxplot(aes(color= lakename)) +
   scale_x_discrete(drop=FALSE) +
   labs(x= 'Month', y= "TP (ug)") +
-  ylim(0,65) +
-  theme(legend.position = "none")
+  ylim(0,65)
 print(Box.TP)
 
 #5c
-Box.TN <- ggplot(PP.Nutrients, aes(x= (month.abb[month]), y= tn_ug)) +
+Box.TN <- ggplot(PP.Nutrients, aes(x= month, y= tn_ug)) +
   geom_boxplot(aes(color= lakename)) +
+  scale_x_discrete(drop = FALSE)
   labs(x= 'Month', y= "TN (ug)") +
   ylim(0,780)
 print(Box.TN)
 
 #5d Cowplot
 Nutrients.Cowplot <- 
-  plot_grid(Box.Temp, 
-            Box.TP + theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(),
-                           axis.title.y = element_blank()),
-            Box.TN + theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(),
-                           axis.title.y = element_blank()),
+  plot_grid(Box.Temp +  
+              theme(legend.position = "none"),
+            Box.TP +
+               theme(legend.position = "none"),
+            Box.TN,
             nrow= 1, align = "vh", axis = "b", labels= c('Temp', 'TP', 'TN'))
 print(Nutrients.Cowplot)
 
@@ -137,7 +136,7 @@ print(Nutrients.Cowplot)
 Question: What do you observe about the variables of interest over seasons 
 and between lakes? 
 
-> Answer: 
+> Answer: The temperature boxplot indicates higher median temperatures in the summer months, and Paul Lake generally has higher median temperatures throughout the year. However, Peter Lake remains higher after temperatures start dropping in Paul Lake. Peter Lake has greater TP levels across the spring and summer months, and Paul lake has the greatest amount of high outliers. The TN boxplot indicates similar median TN values across the spring and summer seasons between lakes and months. However, there are a substantial amount of high lying outliers for both lakes. 
 
 6. [Niwot Ridge] Plot a subset of the litter dataset by displaying only the 
 "Needles" functional group. Plot the dry mass of needle litter by date and 
