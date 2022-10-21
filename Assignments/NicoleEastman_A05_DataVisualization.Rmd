@@ -45,6 +45,7 @@ library(tidyverse)
 library(lubridate)
 library(cowplot)
 library(formatR)
+library(scales)
 PP.Nutrients<- read.csv("Data/Processed/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv")
 Niwot.Litter<- read.csv("Data/Processed/NEON_NIWO_Litter_mass_trap_Processed.csv")
 
@@ -102,26 +103,33 @@ Box.Temp <-
            geom_boxplot() +
            scale_x_discrete(drop=FALSE) +
   labs(x="Month", y = "Temperature (C)") +
-  scale_x_date(limits= as.Date(c("1", "12")))
+  theme(legend.position = "none")
 print(Box.Temp)
 
 #5b
 Box.TP <- ggplot(PP.Nutrients, aes(x= (month.abb[month]), y= tp_ug)) +
   geom_boxplot(aes(color= lakename)) +
+  scale_x_discrete(drop=FALSE) +
   labs(x= 'Month', y= "TP (ug)") +
-  ylim(0,85)
+  ylim(0,65) +
+  theme(legend.position = "none")
 print(Box.TP)
 
 #5c
 Box.TN <- ggplot(PP.Nutrients, aes(x= (month.abb[month]), y= tn_ug)) +
   geom_boxplot(aes(color= lakename)) +
   labs(x= 'Month', y= "TN (ug)") +
-  ylim(0,800)
+  ylim(0,780)
 print(Box.TN)
 
 #5d Cowplot
 Nutrients.Cowplot <- 
-  plot_grid(Box.Temp, Box.TP, Box.TN, labels= c('Temp', 'TP', 'TN'), common.legend= TRUE)
+  plot_grid(Box.Temp, 
+            Box.TP + theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(),
+                           axis.title.y = element_blank()),
+            Box.TN + theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(),
+                           axis.title.y = element_blank()),
+            nrow= 1, align = "vh", axis = "b", labels= c('Temp', 'TP', 'TN'))
 print(Nutrients.Cowplot)
 
 ```
@@ -145,7 +153,6 @@ Needles.Plot <-
   ggplot(filter(Niwot.Litter, functionalGroup == "Needles"), aes(x= collectDate, y= dryMass, color= nlcdClass)) +
            geom_point() + 
   labs(x= "Date", y= "Mass") +
-scale_fill_discrete(name= "NLCD Class", labels= "Evergreen Forest", "Grassland Herbaceuous", "Shrub Scrub" ) +
   scale_x_date(limits= as.Date(c("2016-06-16", "2019-09-25")),
                 date_breaks= "3 months", date_labels = "%b %y") +
   theme(axis.text.x = element_text(angle=90))
