@@ -51,7 +51,7 @@ Are Ozone levels below the threshold for "good" AQI index (0-50)?
 ### Import data set
 
 ```{r, message = FALSE}
-EPAair <- read.csv("./Data/Processed/EPAair_O3_PM25_NC1819_Processed.csv", stringsAsFactors = TRUE)
+EPAair <- read.csv("Data/Processed/EPAair_O3_PM25_NC1819_Processed.csv", stringsAsFactors = TRUE)
 # Set date to date format
 EPAair$Date <- as.Date(EPAair$Date, format = "%Y-%m-%d")
 
@@ -78,7 +78,7 @@ Ozone.plot <- ggplot(EPAair, aes(x = Ozone)) +
   scale_y_continuous(expand = c(0, 0))
 print(Ozone.plot)
 
-# Format as a GLM
+# Format as a GLM, ~1 means no categorical variables
 O3.onesample2 <- lm(Ozone ~ 1, EPAair)
 O3.onesample2
 ```
