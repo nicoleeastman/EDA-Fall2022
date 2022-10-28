@@ -195,10 +195,10 @@ Chem.HSD
 Chem.Crampton.Ward<- Chem.Subset %>%
   filter(lakename %in% c("Crampton Lake", "Ward Lake"))
 
-Chem.TTest<- t.test(Chem.Subset$temperature_C ~ Chem.Subset$lakename, var.equal= TRUE)
+Chem.TTest<- t.test(Chem.Crampton.Ward$temperature_C ~ Chem.Crampton.Ward$lakename)
 Chem.TTest
 
-Chem.Two.Sample <- lm(Chem.Subset$temperature_C ~ Chem.Subset$lakename)
+Chem.Two.Sample <- lm(Chem.Crampton.Ward$temperature_C ~ Chem.Crampton.Ward$lakename)
 Chem.Two.Sample
 
 ```
