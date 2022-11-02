@@ -23,11 +23,13 @@ library(lubridate)
 library(trend)
 #install.packages("zoo")
 library(zoo)
-#install.packages("Kendall")
+install.packages("Kendall")
 library(Kendall)
-#install.packages("tseries")
+install.packages("tseries")
 library(tseries)
-
+library(ggplot2)
+library(dplyr)
+library(tidyr)
 # Set theme
 mytheme <- theme_classic(base_size = 14) +
   theme(axis.text = element_text(color = "black"), 
@@ -81,16 +83,16 @@ BRA_complete <- inner_join(Rainfall_BR_processed,Temp_BR_processed)
 ```{r}
 
 #Exercise 5: Check if there is any missing data for both temperature and rainfall series.
-
-
-
-
+summary(BRA_complete$Rainfall)
+summary(BRA_complete$Temperature_C)
 #Exercise 6: Plot both series over time on separate plots. Add a trend line using geom_smooth(). Can you say something about the trend just by visualizing the data?
+Rainfall.Trend <- ggplot(BRA_complete, aes(x=Date, y=Rainfall)) +
+  geom_line() +
+  geom_smooth()
 
-
-
-
-
+Temp.Trend<-ggplot(BRA_complete, aes(x=Date, y=Temperature_C)) +
+  geom_line() +
+  geom_smooth()
 
 ```
 
@@ -98,8 +100,11 @@ BRA_complete <- inner_join(Rainfall_BR_processed,Temp_BR_processed)
 
 ```{r}
 #Exercise 7: Create a time series objects for each series using ts(). Make sure you specify the starting point and frequency.
+BRA.rainfall.ts<- ts(BRA_complete$Rainfall, start= c(1901,1), frequency= 12)
+head(BRA.ranfall.ts)
 
-
+BRA.temperature.ts<- ts(BRA_complete$Temperature_C, frequency= 12, start= c(1901,1))
+head(BRA.temperature.ts)
 
 ```
 
@@ -120,25 +125,33 @@ The `stl` function decomposes the time series object into its component parts. W
 
 # Exercise 8: Use the stl() function to decompose both series. 
 # Visualize the decomposed series using plot(). What components can you identify?
+BRA.rainfall_Decomposed <- stl(BRA.rainfall.ts, s.window = "periodic")
+BRA.temperature_Decomposed <- stl(BRA.temperature.ts, s.window = "periodic")
 
-
-
-
-
+plot(BRA.rainfall_Decomposed)
+plot(BRA.temperature_Decomposed)
 
 # Exercise 9: Use the times series object generated with the stl() to extract the 
 # components of each series and turn them into data frames.
+BRA.Rainfall.Components <- as.data.frame(BRA.rainfall_Decomposed$time.series[,1:3])
 
+BRA.Temp.Components <- as.data.frame(BRA.temperature_Decomposed$time.series[,1:3])
 
-
-
-
+BRA.Rainfall.Components <- mutate(BRA.Rainfall.Components, Observed = BRA_complete$Rainfall,
+                                 Date= BRA_complete$Date)
+BRA.Temp.Components <- mutate(BRA.Rainfall.Components, Observed = BRA_complete$Rainfall,
+                                 Date= BRA_complete$Date)
 
 # Exercise 10: Visualize how the trend maps onto the data for both series
+ggplot(BRA.Rainfall.Components) +
+  geom_line(aes(y= Observed, x= Date) , size = 0.25) +
+  geom_line(aes(y= trend, x= Date), color= "blue") +
+  ylab("Rainfall")
 
-
-
-
+ggplot(BRA.Temp.Components) +
+  geom_line(aes(y= Observed, x= Date) , size = 0.25) +
+  geom_line(aes(y= trend, x= Date), color= "red") +
+  ylab("Temperature")
 
 
 ```
@@ -159,7 +172,7 @@ Monotonic trends are a gradual shift over time that is consistent in direction. 
 # Exercise 11: Apply one of the trend detection test to the original data set. Remember that the data has seasonal component, which test can be applied in this case?
 
 
-
+Rain_trend <- BRA
 
 
 
