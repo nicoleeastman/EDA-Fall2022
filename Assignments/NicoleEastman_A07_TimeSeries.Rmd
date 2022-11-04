@@ -69,12 +69,18 @@ GaringerOzone <- rbind(Ozone1, Ozone2, Ozone3, Ozone4, Ozone5, Ozone6, Ozone7, O
 
 ```{r}
 # 3
+GaringerOzone$Date <- as.Date(GaringerOzone$Date, format= "%d/%m/%Y")
 
 # 4
+GaringerOzone.Processed <- GaringerOzone %>%
+  select('Date', 'Daily.Max.8.hour.Ozone.Concentration', 'DAILY_AQI_VALUE')
 
 # 5
+Days<- as.data.frame(GaringerOzone.Processed$Date, seq(2010-01-01:2019-12-31))
+colnames(Days) <- c("Date")
 
 # 6
+GaringerOzone.Joined <- left_join(GaringerOzone.Processed, Days, by= NULL, copy= FALSE, keep = FALSE)
 
 
 ```
@@ -85,10 +91,15 @@ GaringerOzone <- rbind(Ozone1, Ozone2, Ozone3, Ozone4, Ozone5, Ozone6, Ozone7, O
 
 ```{r}
 #7
+Ozone.Plot<- ggplot(GaringerOzone.Joined, aes(x= Date, y= Daily.Max.8.hour.Ozone.Concentration)) +
+  geom_line() +
+  geom_smooth() +
+  ylab("Ozone Concentration (ppm)")
+print(Ozone.Plot)
 
 ```
 
->Answer:
+>Answer: There's not an obvious trend in ozone concentration over time. The smoothed line shows a decrease from 2010 to 2015 and then a slight increase from 2015 to 2020.
 
 ## Time Series Analysis
 
@@ -98,16 +109,25 @@ Study question: Have ozone concentrations changed over the 2010s at this station
 
 ```{r}
 #8
+Ozone.Clean <- GaringerOzone.Joined %>%
+ mutate(Ozone.Clean= zoo::na.approx(Daily.Max.8.hour.Ozone.Concentration))
+
+ggplot(Ozone.Clean) +
+  geom_line(aes(x= Date, y= Daily.Max.8.hour.Ozone.Concentration)) +
+  ylab("Ozone Concentration (ppm)")
 
 ```
 
-> Answer: 
-
+> Answer: We used the linear interpolation because the smoothed line in the previous questions shows mostly a linear trend. Additionally, the piecewise interpolation would match a value to the nearest data rather than continuing along the trend. The spline interpolation uses a quadratic function to fill-in the missing data, but there does not seem to be a exponential correlation between x and y for this dataframe.
 
 9. Create a new data frame called `GaringerOzone.monthly` that contains aggregated data: mean ozone concentrations for each month. In your pipe, you will need to first add columns for year and month to form the groupings. In a separate line of code, create a new Date column with each month-year combination being set as the first day of the month (this is for graphing purposes only)
 
 ```{r}
 #9
+GaringerOzone.monthly <- Ozone.Clean %>%
+  separate(Ozone.Clean,c("Null","Month","Null2")," ") %>% 
+  mutate( Date = my(paste0(Month,"-",Year))) %>% 
+  select(Date, Ozone.Clean)
 
 ```
 
@@ -116,6 +136,9 @@ Study question: Have ozone concentrations changed over the 2010s at this station
 
 ```{r}
 #10
+GaringeOzone.daily.ts <- ts(Ozone.Clean$Ozone.Clean, start = c(2010,1), frequency= 365)
+
+GaringerOzone.monthly.ts <- ts(GraingerOzone.monthly$Ozone.Clean, start = c(,1), frequency = 12)
 
 ```
 
@@ -124,7 +147,11 @@ Study question: Have ozone concentrations changed over the 2010s at this station
 
 ```{r}
 #11
+Ozone.Daily.Decomposed <- stl(GaringerOzone.daily.ts, s.window = "periodic")
+Ozone.Monthly.Decomposed <- stl(GaringerOzone.monthly.ts, s.window = "periodic")
 
+plot(Ozone.Daily.Decomposed)
+plot(Ozone.Monthly.Decomposed)
 
 ```
 
@@ -133,20 +160,26 @@ Study question: Have ozone concentrations changed over the 2010s at this station
 
 ```{r}
 #12
-
+Ozone.Data.Trend <- Kendall:: SeasonalMannKendall(GaringerOzone.monthly.ts)
+Ozone.Data.Trend
+summary(Ozone.Data.Trend)
 
 
 ```
 
-> Answer: 
+> Answer: The Mann-Kendall is most appropriate because it doesn't require that the residuals be fitted to the parametric test like in linear regressions. 
 
 13. Create a plot depicting mean monthly ozone concentrations over time, with both a geom_point and a geom_line layer. Edit your axis labels accordingly.
 
 ```{r}
 # 13
-
-
-
+Ozone.MK.Plot <- ggplot(GaringerOzone.monthly, aes(x= Date, y= Ozone.Clean)) +
+  geom_point() +
+  geom_line() +
+  xlab("Month") +
+  ylab("Average Ozone Concentration") +
+  geom_smooth(method=lm)
+print(Ozone.MK.Plot)
 
 ```
 
@@ -160,12 +193,15 @@ Study question: Have ozone concentrations changed over the 2010s at this station
 
 ```{r}
 #15
+Ozone.Seasonal.Components <- as.data.frame(Ozone.Monthly.Decomposed$time.series[,1:3])
 
-
+Ozone.Seasonal.Components <- mutate(Ozone.Seasonal.Components,
+        Observed = GaringerOzone.monthly$Ozone.Clean,     
+        Date = GaringerOzone.monthly$Date)
 
 #16
-
-
+Ozone.Extracted.ts <- ts(Ozone.Seasonal.Components$Observed, start = c(,1), frequency = 12)
+Ozone.Extracted.Trend <- Kendall:: SeasonalMannKendall(Ozone.Extracted.ts)
 
 
 ```
