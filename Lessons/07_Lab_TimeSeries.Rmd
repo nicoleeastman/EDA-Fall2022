@@ -177,8 +177,6 @@ Rain_trend <- BRA
 
 
 
-
-
 # Exercise 12: Now remove the seasonality and apply another test. Compare the results with what you obtained on Exercise 9.
 
 

@@ -190,7 +190,7 @@ summary(wind_data$AWND)
 # In real applications you will simply replace NAs
 wind_data_clean <- 
   wind_data %>% 
-  mutate( AWND.clean = zoo::na.approx(AWND) )
+  na.approx()
 
 summary(wind_data_clean$AWND.clean)
 #Note the NA is gone

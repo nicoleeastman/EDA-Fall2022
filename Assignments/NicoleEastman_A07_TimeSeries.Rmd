@@ -28,6 +28,14 @@ The completed exercise is due on Tuesday, March 16 at 11:59 pm.
 * Set your ggplot theme
 
 2. Import the ten datasets from the Ozone_TimeSeries folder in the Raw data folder. These contain ozone concentrations at Garinger High School in North Carolina from 2010-2019 (the EPA air database only allows downloads for one year at a time). Import these either individually or in bulk and then combine them into a single dataframe named `GaringerOzone` of 3589 observation and 20 variables. 
+```{r setup, include=FALSE}
+install.packages('formatR')
+library(formatR)
+library(tidyr)
+knitr::opts_chunk$set(tidy.opts=list(width.cutoff=60), tidy=TRUE)
+
+```
+
 
 ```{r, message = FALSE}
 #1 Set-up
