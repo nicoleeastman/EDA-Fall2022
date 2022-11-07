@@ -75,6 +75,8 @@ class(epa_pm25_sites_sf)
 #What is its CRS again?
 st_crs(epa_pm25_sites_sf)$epsg
 
+mapview(epa_pm25_sites_sf)
+
 #Plot the data
 ggplot(data=epa_pm25_sites_sf) +
   geom_sf()
@@ -89,7 +91,7 @@ The `sf` package allows us to read many existing data formats, including ArcGIS 
 Below we read in the USA counties shapefile, filtering for just the NC features (NC has a state FIPS code of "37"...). We also see that `sf` plays nice with "tidyverse" syntax (e.g. pipes) and functions (e.g. filter). The `sf` package also includes some new spatial methods for exploring our data (e.g. `st_bbox` which draws a bounding box around all spatial features).
 
 ```{r read.filtered.records.from.shapefile.to.sf.object}
-#
+# reading spatial data
 counties_sf<- st_read('./Data/Spatial/cb_2018_us_county_20m.shp') %>% 
   filter(STATEFP == 37) #Filter for just NC Counties
 
@@ -119,20 +121,19 @@ mapView(counties_sf, zcol = "AWATER")
 
 ```{r read HUCs shapefile}
 #Read the shapefile into an sf dataframe named "huc8_sf"
-
+huc8_sf <- st_read('./Data/Spatial/NCHUC8.shp')
 
 #Reveal the columns
-
+colnames(huc8_sf)
 
 #Check the CRS
-
+st_crs(huc8_sf) 
 
 #Examine some records
 head(huc8_sf)
 
 #View the data as a map, colored by the acreage in each
-
-
+mapview(huc8_sf)
 
 
 ```
@@ -143,12 +144,13 @@ head(huc8_sf)
 
 ```{r Select the Upper Neuse HUC 8}
 #Read the shapefile into an sf dataframe
-
+upperneuse_sf <- st_read('./Data/Spatial/NCHUC8.shp') %>% 
+  filter(SUBBASIN == 'Upper Neuse')
 
 
 #Create a map
 
-
+mapview(huc8_sf)
 
 
 ```
@@ -173,13 +175,13 @@ colnames(powerplants_sf)
 nrow(powerplants_sf)
 
 #View on a map - specify the geometry column to draw faster
-plot(powerplants_sf$geometry)
+mapview(powerplants_sf$geometry)
 
 #Filter for just powerplants found in NC
 nc_powerplants_sf <- powerplants_sf %>% 
   filter(STATE == "NC") 
 
-#Have a look the variety of types (and number of each)
+#Have a look the variety of types (and number of each), counts types
 nc_powerplants_sf %>% 
   st_drop_geometry() %>% 
   count(TYPE, sort=TRUE)
@@ -246,25 +248,20 @@ ggplot() +
 
 ```{r}
 #Compute HUC8 wind energy
-
-
-
-
-
+huc_8_wind <- read.csv('https://raw.githubusercontent.com/ENV859/EnviroAtlasData/main/Wind_Energy.csv', colClasses = c('HUC_12' = 'factor')) %>%
+          mutate(HUC_8 = substr(HUC_12,1,8)) %>%
+            group_by(HUC_8) %>%
+            summarize(kWhkm2day= sum(kWhkm2day))
   
 #Join to HUC_8 features
+huc_sf_wind <-huc8_sf %>%
+  left_join(huc_8_wind, by = c('HUC_8', 'HUC_8'))
 
-
-
-
+#or
+huc_8_sf_wind <- merge(x= huc8_sf, y= huc_8_wind, by.x = "HUC_8", by.y = "HUC_8")
 
 #View the outputs
-
-
-
-
-
-
+mapview(huc_8_sf_wind, zcol = "kWhkm2day")
 
 ```
 
@@ -295,13 +292,14 @@ unique(huc8_sf$DWQ_Basin)
 huc2_sf <- huc8_sf %>% 
   group_by(DWQ_Basin) %>% 
   summarize(
-    acres = sum(ACRES),
-    sq_miles = sum(SQ_MILES)
+    ACRES = sum(ACRES),
+    SQ_MILES = sum(SQ_MILES)
   )
 
 #Map the data
 ggplot() + geom_sf(data=huc2_sf,aes(fill=acres))
 
+mapview(huc2_sf, zcol= 'ACRES')
 ```
 
 ## 3.2 Transforming coordinate reference systems of datasets
@@ -369,8 +367,10 @@ neuse_counties_sf <- neuse_sf %>%
 myMap + mapview(neuse_counties_sf, alpha.regions = 0)
 
 #Update the area the features, now that some are clipped
-neuse_counties_sf <- neuse_counties_sf %>% 
-  mutate(Area_m2 = as.numeric(st_area(neuse_counties_sf$geometry)))
+
+neuse_counties_sf<- neuse_counties_sf %>%
+  mutate(Area_m2 = st_area(neuse_counties_sf$geometry)) %>%
+  as.numeric()
   
 mapview(neuse_counties_sf, zcol='Area_m2')
 
@@ -380,15 +380,8 @@ mapview(neuse_counties_sf, zcol='Area_m2')
 
 ```{r EXERCISE: Clipping}
 #Select the Triangle County from the 
-
-
-  
-#Grab the intersecting HUC_8s
-
-
-
-#Intersect the HUC_8s
-
+the_triange<- counties_sf_utm %>%
+  filter(NAME %in% c("Chatham", "Durham", "Wake", "Orange", "Chatham"))
 
 
 ```

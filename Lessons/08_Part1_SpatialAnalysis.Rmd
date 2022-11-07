@@ -32,12 +32,13 @@ The packages we'll need for this lesson are below. Install as necessary and ensu
 library(tidyverse, quietly = TRUE)
 library(lubridate)
 
-#install.packages('sf')
+install.packages('sf')
 library(sf)
-#install.packages('leaflet')
+install.packages('leaflet')
 library(leaflet)
-#install.packages('mapview')
+install.packages('mapview')
 library(mapview)
+library(ggplot2)
 
 #Disable on-the-fly projections
 sf::sf_use_s2(FALSE)
@@ -117,6 +118,7 @@ EPAair.sites <- EPAair %>%
 EPAair.sf <- EPAair.sites %>% 
   st_as_sf(coords = c('SITE_LONGITUDE','SITE_LATITUDE'),
            crs=4326)
+class(EPAair.sf)
 
 #View the data using the methods above...
 
@@ -130,7 +132,7 @@ sfg_GraingerHall <- st_point(c(-78.9427,36.00465))
 class(sfg_GraingerHall)
 mapview(sfg_GraingerHall)
 
-#Upgrade to a simple feature geometry column by adding a crs 
+#Upgrade to a simple feature geometry column by adding a crs, ties to reference site 
 sfc_GraingerHall <- st_sfc(sfg_GraingerHall,crs=4326)
 class(sfc_GraingerHall)
 mapview(sfc_GraingerHall)
@@ -155,7 +157,7 @@ Let's explore:
 ## EXERCISE: Buffering - a simple spatial analyis
 "Buffering" a simple feature extends the area outward a specified distance. The code below buffers Grainger Hall 1 "unit". 
 ```{r buffer Grainger hall}
-#Buffer Grainger Hall 1 unit
+#Buffer Grainger Hall 1 unit, expands a geometry outward by an unit
 the_buffer <- sf_GraingerHall %>% st_buffer(1)
 
 #View the result
