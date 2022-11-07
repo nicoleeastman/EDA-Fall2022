@@ -51,6 +51,7 @@ library(lubridate)
 library(sf)
 library(mapview)
 library(RColorBrewer)
+library(dplyr)
 ```
 
 # 2 READING IN SPATIAL DATA
@@ -523,6 +524,9 @@ leaflet() %>% addTiles() %>%
 Tip: See <http://leaflet-extras.github.io/leaflet-providers/> for other basemaps
 
 ```{r Visualizing multiple datasets with leaflet}
+install.packages("leaflet")
+library(leaflet)
+
 leaflet() %>% 
   addProviderTiles(providers$Esri.DeLorme) %>%  
   addPolygons(data = counties_WGS84, 
@@ -540,9 +544,11 @@ leaflet() %>%
 
 ```
 
+
 ### 4.2.3 Leaflet - linked and synced plots
 
 ```{r Visualizing multiple datasets with leaflet: linked and synced maps}
+
 m1 <- leaflet() %>% 
   addTiles() %>%  
   addPolygons(data = counties_WGS84, color = "orange", weight = 1, smoothFactor = 0.5,   
@@ -562,7 +568,7 @@ m2 <- leaflet() %>%
 
 
 
-#install.packages("leafsync")
+install.packages("leafsync")
 library(leafsync)
 
 #Create an lattice view of the two leaflet maps
