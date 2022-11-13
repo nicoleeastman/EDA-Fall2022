@@ -152,7 +152,9 @@ upperneuse_sf <- st_read('./Data/Spatial/NCHUC8.shp') %>%
 #Create a map
 
 mapview(huc8_sf)
-
+ggplot() +
+  geom_sf(data=huc8_sf, fill='orange') +
+  geom_sf(data=huc8_sf_filtered, fill='purple')
 
 ```
 
@@ -263,6 +265,9 @@ huc_8_sf_wind <- merge(x= huc8_sf, y= huc_8_wind, by.x = "HUC_8", by.y = "HUC_8"
 
 #View the outputs
 mapview(huc_8_sf_wind, zcol = "kWhkm2day")
+ggplot(data=huc_8_sf_wind) +
+  geom_sf(aes(fill=SumWindEnergy)) +
+  labs(title= 'Wind Energy by HUC 8', fill= 'MW/year')
 
 ```
 
@@ -365,6 +370,8 @@ myMap + mapview(neuse_intersect_2, alpha.regions = 0)
 #Actually intersect the counties (not just select those that intersect)
 neuse_counties_sf <- neuse_sf %>% 
   st_intersection(counties_sf_utm)
+
+#geometries
 myMap + mapview(neuse_counties_sf, alpha.regions = 0)
 
 #Update the area the features, now that some are clipped
@@ -384,7 +391,18 @@ mapview(neuse_counties_sf, zcol='Area_m2')
 the_triange<- counties_sf_utm %>%
   filter(NAME %in% c("Chatham", "Durham", "Wake", "Orange", "Chatham"))
 
+#Grab intersecting HUC-8s
+triangle_HUCs <- huc8_sf_utm %>%
+  filter(st_intersects(x=., y= triangle_co, sparse = F))
+triangle_HUCs <- huc8_sf_utm[the_triange,]
 
+ggplot() +
+  geom_sf(data= the_triange, color='grey') +
+  geom_sf(data= huc8_sf_utm, color='green', fille= NA) +
+  geom_sf(data=triangle_HUCs, color = 'blue', fill =NA)
+ #Intersect HUC 8s
+triangle_HUCs.clipped <- triangle_co %>%
+  st_intersection(huc8_sf_utm)
 ```
 
 ## 3.3 Geometry manipulations
