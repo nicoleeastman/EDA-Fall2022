@@ -70,7 +70,13 @@ Below we read in the USA counties shapefile, filtering for just the NC features 
 counties_sf<- st_read('./Data/Spatial/cb_2018_us_county_20m.shp') %>% 
   filter(STATEFP == 37) #Filter for just NC Counties
 
+colnames(counties_sf)
+st_crs(counties_sf)
+nrows(counties_sf)
 #
+st_bbox(counties_sf)
+
+head(counties_sf)
 mapView(counties_sf, zcol = "AWATER")
 ```
 
@@ -99,9 +105,9 @@ huc8_sf_filtered <- st_read('./Data/Spatial/NCHUC8.shp') %>%
 
 
 #Create a map
-mapview(huc8_sf, col.regions = 'orange') +
-  mapview(huc8_sf_filtered, col.regions = 'purple', alpha.regions = 1)
-
+ggplot() +
+  geom_sf(data=huc8_sf, fill='orange') +
+  geom_sf(data=huc8_sf_filtered, fill='purple')
 ```
 
 

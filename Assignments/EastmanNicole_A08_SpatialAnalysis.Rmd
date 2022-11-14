@@ -1,11 +1,13 @@
 ---
-title: "Assignment 8: Spatial Analysis in R"
+title: 'Assignment 8: Spatial Analysis in R'
 author: "Nicole Eastman"
-output: pdf_document
+output:
+  html_document:
+    df_print: paged
 geometry: margin=2.54cm
-editor_options: 
+editor_options:
   chunk_output_type: console
-  markdown: 
+  markdown:
     wrap: 72
 ---
 
@@ -123,11 +125,11 @@ colnames(gage_locations_sf)
 ```{r Plot the spatial features}
 #13. Plot the gage locations atop the county features
 county_gage_locations.plot<- ggplot() +
-  geom_sf(data=gage_locations_sf, fill = 'blue') +
-  geom_sf(data= counties_sf, fill= 'purple') +
+  geom_sf(data= counties_sf, aes(fill= AWATER)) +
+  geom_sf(data=gage_locations_sf, color= "red") +
   labs(title= 'NWIS Gage Locations in Nebraska',
        subtitle= 'Nicole Eastman')
-view(county_gage_locations.plot)
+county_gage_locations.plot
 
 ```
 
@@ -193,11 +195,13 @@ Up next we will do some spatial analysis with our data. To prepare for this, we 
 
 ```{r}
 #20 Transform the counties and gage location datasets to UTM Zone 14
-
+counties_utm <- st_transform(counties_sf, crs = 26917)
+gage_utm <- st_transform(gage_locations_sf, crs= 26917)
 
 #21 Plot the data
-
-
+mapview(counties_utm) +
+  mapview(gage_utm, col.regions = 'red')
+  
 ```
 
 
@@ -214,13 +218,16 @@ Now let's zoom into a particular county and examine the gages located there.
 
 ```{r}
 #22 Select the county
-
+Lancaster.subset <- counties_utm %>%
+  filter(NAME %in% c("Lancaster"))
 
 #23 Select gages within the selected county
-
+Lancaster.gages <- gage_utm[Lancaster.subset,]
 
 #24 Plot
-
-
+Lancaster.mapview<- mapview(counties_utm) +
+  mapview(Lancaster.subset, col.regions= 'red') +
+  mapview(Lancaster.gages, cex= 0.5)
+Lancaster.mapview
 
 ```
