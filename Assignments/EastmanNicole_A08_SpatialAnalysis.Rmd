@@ -38,6 +38,7 @@ library(tidyverse)
 library(sf)
 library(leaflet)
 library(mapview)
+library(RColorBrewer)
 
 ```
 
@@ -121,7 +122,12 @@ colnames(gage_locations_sf)
 
 ```{r Plot the spatial features}
 #13. Plot the gage locations atop the county features
-
+county_gage_locations.plot<- ggplot() +
+  geom_sf(data=gage_locations_sf, fill = 'blue') +
+  geom_sf(data= counties_sf, fill= 'purple') +
+  labs(title= 'NWIS Gage Locations in Nebraska',
+       subtitle= 'Nicole Eastman')
+view(county_gage_locations.plot)
 
 ```
 
@@ -140,19 +146,22 @@ Lastly, we want to attach some gage height data to our site locations. I've cons
 
 ```{r}
 #14. Read the site flow data into a data frame
-
+flow_data <- read.csv('./Data/Raw/NWIS_SiteFlowData_NE_RAW.csv')
 
 #15. Show the column names
-
+colnames(flow_data)
 
 #16. Join the flow data to our NWIS gage location spatial dataframe
-
+flow_gages_join <- merge(x= gage_locations_sf,
+                         y= flow_data,
+                         by.x = "site_no",
+                         by.y = "site_no")
 
 #17. Show the column names of the joined dataset
-
+colnames(flow_gages_join)
 
 #18. Show the dimensions of this joined dataset
-
+dim(flow_gages_join)
 
 ```
 
@@ -164,7 +173,9 @@ Now we can examine where the flooding appears most acute by visualizing gage hei
 
 ```{r}
 #Map the points, sized by gage height
-
+mapview(counties_sf, zcol= 'AWATER', 
+        col.regions= brewer.pal(2, 'RdBu')) +
+  mapview(flow_gages_join, cex= 'gage_ht')
 
 ```
 
