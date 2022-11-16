@@ -19,8 +19,13 @@ getwd()
 library(tidyverse)
 library(lubridate)
 
-#install.packages("rvest")
+install.packages("rvest")
 library(rvest)
+library(ggplot2)
+library(dplyr)
+install.packages("purrr")
+library(purrr)
+library(stringr)
 
 # Set theme
 mytheme <- theme_classic() +
@@ -93,6 +98,7 @@ When successful, the box should display `.table tr:nth-child(1) td:nth-child(2)`
 With this id known, we can extract it's value in a two-step process. First we use `html_nodes()` to grab the element using its tag. Then we extract the value associated with that element text using the `html_text()` function. 
 
 ```{r scrape.some.data}
+#using chrome selector gadget
 the_registrant <- webpage %>% 
   html_nodes(".table tr:nth-child(1) td:nth-child(2)") %>% 
   html_text()
@@ -111,7 +117,7 @@ the_facility_name
 the_facility_type <- webpage %>% 
   html_nodes("tr:nth-child(2) .left~ .left+ td.left") %>% 
   html_text()
-the_facility_type
+
 ```
 
 Next, we'll extract multiple items from the web page into a list object. Using Selector Gadget, highlight in yellow or green all the Average Daily Withdrawal (MGD) values from the web page. Tip: Hold the <ctrl> key down while clicking elements to add/subtract regions from selected regions.
@@ -170,7 +176,7 @@ This begins by setting the parameters of the page we'll be scraping to variables
 #Construct the scraping web address, i.e. its URL
 the_base_url <- 'https://www.ncwater.org/WUDC/app/WWATR/report/view'
 the_facility <- '0004-0001'
-the_year <- 2015
+the_year <- 2020
 the_scrape_url <- paste0(the_base_url, '/', the_facility, '/', the_year)
 print(the_scrape_url)
 
@@ -207,6 +213,10 @@ ggplot(df_withdrawals,aes(x=Date,y=Avg_Withdrawals_mgd)) +
        y="Withdrawal (mgd)",
        x="Date")
 
+```
+```{r}
+the_df <- scrape.it(2018, '0004-0001')
+view(the_df)
 ```
 
 Run the above; it should produce the same result as the previous R chunk. HOWEVER, change the year variable to `2015` and re-run the chunk. Change the facility ID to `0218-0238` and run again. Now, we have a nifty little scraping tool!
@@ -262,7 +272,7 @@ view(the_df)
 ## 2.3 Use iterators to retrieve data for a set of years
 R can iterate using either "lapply" or Purrrs' "map" functions. 
 ```{r scrape.multiple.years.of.data}
-#Set the inputs to scrape years 2015 to 2020 for the site "0004-0001"
+#Set the inputs to scrape years 2015 to 2020 for the site "0004-0001", creates 3 different data frames
 the_years = rep(2018:2020)
 my_facility = '0004-0001'
 
@@ -338,7 +348,7 @@ df_2020 <- bind_rows(dfs_2020)
 
 
 #Plot
-ggplot(df_2020,aes(y = Avg_Withdrawals_mgd, x=Facility_type)) +
+ggplot(df_2020,aes(y = Avg_Withdrawals_mgd, x=as.factor(Month))) +
   geom_boxplot()
 
 ```
