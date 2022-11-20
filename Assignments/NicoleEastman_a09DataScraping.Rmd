@@ -1,6 +1,6 @@
 ---
 title: "Assignment 09: Data Scraping"
-author: "Student Name"
+author: "Nicole Eastman"
 output: pdf_document
 geometry: margin=2.54cm
 editor_options: 
@@ -27,8 +27,19 @@ This exercise accompanies the lessons in Environmental Data Analytics on data sc
 * Set your ggplot theme
 
 ```{r, message = FALSE}
-#1
+#1 Set-up
+getwd()
 
+library(tidyverse)
+library(rvest)
+library(lubridate)
+library(ggplot2)
+library(dataRetrieval)
+
+mytheme <- theme_classic() +
+  theme(axis.text = element_text(color = "black"), 
+        legend.position = "top")
+theme_set(mytheme)
 
 ```
 
@@ -40,8 +51,8 @@ This exercise accompanies the lessons in Environmental Data Analytics on data sc
 Indicate this website as the as the URL to be scraped. (In other words, read the contents into an `rvest` webpage object.)
 
 ```{r set.the.scraping.website}
-#2
-
+#2 Using rvest to scrape website 
+theURL <- read_html(paste0('https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=03-32-010&year=2021'))
 
 ```
 
@@ -60,14 +71,14 @@ In the code chunk below scrape these values, assigning them to four separate var
 >HINT: The first value should be "Durham", the second "03-32-010", the third "Municipality", and the last should be a vector of 12 numeric values (represented as strings), with the first value being "27.6400".
 
 ```{r scrape.the.data}
-#3
-water.system.name <- 
+#3 Use the Selector Gadget tool to assign values to variables 
+water.system.name <- theURL %>% html_nodes('div+ table tr:nth-child(1) td:nth-child(2)') %>% html_text()
   
-pswid <- 
+pswid <- theURL %>% html_nodes('td tr:nth-child(1) td:nth-child(5)') %>% html_text()
   
-ownership <- 
+ownership <- theURL %>% html_nodes('div+ table tr:nth-child(2) td:nth-child(4)') %>% html_text()
   
-max.withdrawals.mgd <- 
+max.withdrawals.mgd <- theURL %>% html_nodes('th~ td+ td') %>% html_text()
 
 ```
 
@@ -81,13 +92,22 @@ max.withdrawals.mgd <-
 5. Create a line plot of the maximum daily withdrawals across the months for 2021
 
 ```{r create.a.dataframe.from.scraped.data}
-#4
+#4 Create dataframe with variables, convert month to order they are scraped from the website, and mutate to create a date format column
+df_withdrawals <- data.frame("Water_System" = water.system.name,
+                               "PSWID" = pswid,
+                               "Ownership" = ownership,
+                                "Max_Withdrawals" = max.withdrawals.mgd,
+                                "Month" = rep(1:12),
+                                "Year" = rep(2021))
+df_withdrawals$Month[c(1:12)] <- c("Jan", "May", "Sept", "Feb", "Jun", "Oct", "Mar", "Jul", "Nov", "Apr", "Aug", "Dec")
 
-
-
-#5
-
-
+df_withdrawals <- df_withdrawals %>%
+  mutate(Date = my(paste(Month,"-",Year)))
+  
+#5 
+ggplot(df_withdrawals,aes(x=Month, y=Max_Withdrawals, group=1)) + 
+  geom_line() +
+  labs(x = "Month",y = "Max Daily Withdrawals")
 
 ```
 
@@ -95,8 +115,30 @@ max.withdrawals.mgd <-
 
 ```{r construct.a.scraping.function}
 #6.
+scrape.it <- function(pswid, year){
+  the_website <- read_html(paste0('https://www.ncwater.org/WUDC/app/LWSP/report.php?', pswid, '/', year))
+  water.system.name <- the_website %>% html_nodes('div+ table tr:nth-child(1) td:nth-child(2)') %>% html_text()
+  
+pswid <- the_website %>% html_nodes('td tr:nth-child(1) td:nth-child(5)') %>% html_text()
+  
+ownership <- the_website %>% html_nodes('div+ table tr:nth-child(2) td:nth-child(4)') %>% html_text()
+  
+max.withdrawals.mgd <- the_website %>% html_nodes('th~ td+ td') %>% html_text()
 
+df_PSWID <- data.frame("Water_System" = water.system.name,
+                               "PSWID" = pswid,
+                               "Ownership" = ownership,
+                                "Max_Withdrawals" = max.withdrawals.mgd,
+                                "Month" = rep(1:12),
+                                "Year" = rep(2015))
+df_PSWID$Month[c(1:12)] <- c("Jan", "May", "Sept", "Feb", "Jun", "Oct", "Mar", "Jul", "Nov", "Apr", "Aug", "Dec")
 
+df_PSWID <- df_PSWID %>%
+  mutate(Date = my(paste(Month,"-",Year))) %>%
+  mutate(Year=year) %>%
+  mutate(PSWID=pswid)
+return(df_PSWID)
+}
 
 ```
 
@@ -104,7 +146,7 @@ max.withdrawals.mgd <-
 
 ```{r fetch.and.plot.Durham.2015.data}
 #7
-
+df2015_PSWID1 <- scrape.it('03-32-010', 2015)
 
 ```
 
