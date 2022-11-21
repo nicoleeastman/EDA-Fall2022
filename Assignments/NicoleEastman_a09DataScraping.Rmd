@@ -99,10 +99,11 @@ df_withdrawals <- data.frame("Water_System" = water.system.name,
                                 "Max_Withdrawals" = max.withdrawals.mgd,
                                 "Month" = rep(1:12),
                                 "Year" = rep(2021))
-df_withdrawals$Month[c(1:12)] <- c("Jan", "May", "Sept", "Feb", "Jun", "Oct", "Mar", "Jul", "Nov", "Apr", "Aug", "Dec")
+df_withdrawals$Month<- c("Jan", "May", "Sept", "Feb", "Jun", "Oct", "Mar", "Jul", "Nov", "Apr", "Aug", "Dec")
 
 df_withdrawals <- df_withdrawals %>%
-  mutate(Date = my(paste(Month,"-",Year)))
+  mutate(Date = my(paste(Month,"-",Year)),
+         as.Date(paste("01", c("Month")), format= "%b"))
   
 #5 
 ggplot(df_withdrawals,aes(x=Month, y=Max_Withdrawals, group=1)) + 
@@ -124,20 +125,11 @@ pswid <- the_website %>% html_nodes('td tr:nth-child(1) td:nth-child(5)') %>% ht
 ownership <- the_website %>% html_nodes('div+ table tr:nth-child(2) td:nth-child(4)') %>% html_text()
   
 max.withdrawals.mgd <- the_website %>% html_nodes('th~ td+ td') %>% html_text()
-
-df_PSWID <- data.frame("Water_System" = water.system.name,
-                               "PSWID" = pswid,
-                               "Ownership" = ownership,
-                                "Max_Withdrawals" = max.withdrawals.mgd,
-                                "Month" = rep(1:12),
-                                "Year" = rep(2015))
-df_PSWID$Month[c(1:12)] <- c("Jan", "May", "Sept", "Feb", "Jun", "Oct", "Mar", "Jul", "Nov", "Apr", "Aug", "Dec")
-
-df_PSWID <- df_PSWID %>%
-  mutate(Date = my(paste(Month,"-",Year))) %>%
-  mutate(Year=year) %>%
-  mutate(PSWID=pswid)
-return(df_PSWID)
+df_PSWID <- data.frame("PSWID" = pswid,
+                       "Max_Withdrawals" = max.withdrawals.mgd,                               "Month" = as.Date(Month, rep(1:12)),
+                       "Year" = rep(year,12)) %>%
+  mutate(Ownership = !!ownership,
+         as.Date(paste(c("Month")), format= "%b"))
 }
 
 ```
@@ -154,8 +146,22 @@ df2015_PSWID1 <- scrape.it('03-32-010', 2015)
 
 ```{r fetch.and.plot.Asheville.2015.data}
 #8
+df_Asheville2015<- scrape.it('01-11-010')
 
+the_year<- 2015
+the_pswid<- "03-32-010" & "01-11-010"
 
+df_combined<- lapply(X= the_year,
+                     FUN= scrape.it,
+                     PSWID = the_pswid)
+
+ggplot(df_combined, aes(x= Month, y= Max_Withdrawals)) +
+         geom_line() +
+         geom_smooth(method="loess",se=FALSE) +
+         labs(tite= "Durham and Asheville Maximum Water Withdrawals",
+              subtitle = water.system.name,
+              y= 'Month',
+              x= 'Max Withdrawal')
 ```
 
 
@@ -165,7 +171,8 @@ df2015_PSWID1 <- scrape.it('03-32-010', 2015)
 
 ```{r fetch.and.plot.Asheville.multiyear.data}
 #9
-
+the_PSWID<- '01-11-010'
+the_years <- 
 
 ```
 
