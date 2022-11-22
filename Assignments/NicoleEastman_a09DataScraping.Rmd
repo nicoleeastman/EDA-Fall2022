@@ -28,6 +28,10 @@ This exercise accompanies the lessons in Environmental Data Analytics on data sc
 
 ```{r, message = FALSE}
 #1 Set-up
+library(formatR)
+library(tidyr)
+knitr::opts_chunk$set(tidy.opts=list(width.cutoff=60), tidy=TRUE)
+
 getwd()
 
 library(tidyverse)
@@ -93,6 +97,8 @@ max.withdrawals.mgd <- theURL %>% html_nodes('th~ td+ td') %>% html_text()
 
 ```{r create.a.dataframe.from.scraped.data}
 #4 Create dataframe with variables, convert month to order they are scraped from the website, and mutate to create a date format column
+Month <- c('01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12')
+
 df_withdrawals <- data.frame("Water_System" = water.system.name,
                                "PSWID" = pswid,
                                "Ownership" = ownership,
@@ -116,8 +122,8 @@ ggplot(df_withdrawals,aes(x=Month, y=Max_Withdrawals, group=1)) +
 
 ```{r construct.a.scraping.function}
 #6.
-scrape.it <- function(pswid, year){
-  the_website <- read_html(paste0('https://www.ncwater.org/WUDC/app/LWSP/report.php?', pswid, '/', year))
+scrape.it <- function(the_pswid, Year){
+  the_website <- read_html(paste0('https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=', the_pswid, '&year=', Year))
   water.system.name <- the_website %>% html_nodes('div+ table tr:nth-child(1) td:nth-child(2)') %>% html_text()
   
 pswid <- the_website %>% html_nodes('td tr:nth-child(1) td:nth-child(5)') %>% html_text()
@@ -125,11 +131,15 @@ pswid <- the_website %>% html_nodes('td tr:nth-child(1) td:nth-child(5)') %>% ht
 ownership <- the_website %>% html_nodes('div+ table tr:nth-child(2) td:nth-child(4)') %>% html_text()
   
 max.withdrawals.mgd <- the_website %>% html_nodes('th~ td+ td') %>% html_text()
-df_PSWID <- data.frame("PSWID" = pswid,
-                       "Max_Withdrawals" = max.withdrawals.mgd,                               "Month" = as.Date(Month, rep(1:12)),
-                       "Year" = rep(year,12)) %>%
+
+df_PSWID <- data.frame(Month = (Month),
+                       Year= Year,
+                       Max.withdrawals = as.numeric(max.withdrawals.mgd),
+                       Date = as.Date(paste0(Month, "-", Year), format = "%M-%Y")) %>%
   mutate(Ownership = !!ownership,
-         as.Date(paste(c("Month")), format= "%b"))
+         PWSID = !!pswid,
+         System.name = !!water.system.name)
+return(df_PSWID)
 }
 
 ```
@@ -146,22 +156,17 @@ df2015_PSWID1 <- scrape.it('03-32-010', 2015)
 
 ```{r fetch.and.plot.Asheville.2015.data}
 #8
-df_Asheville2015<- scrape.it('01-11-010')
+df_Asheville2015<- scrape.it('01-11-010', 2015)
 
-the_year<- 2015
-the_pswid<- "03-32-010" & "01-11-010"
+joined_df <- rbind(df_Asheville2015, df2015_PSWID1)
 
-df_combined<- lapply(X= the_year,
-                     FUN= scrape.it,
-                     PSWID = the_pswid)
-
-ggplot(df_combined, aes(x= Month, y= Max_Withdrawals)) +
-         geom_line() +
-         geom_smooth(method="loess",se=FALSE) +
+combined.plot <- ggplot(joined_df, aes(x= Month, y= Max.withdrawals, color = System.name, group = 2)) +
+  geom_point() +
          labs(tite= "Durham and Asheville Maximum Water Withdrawals",
               subtitle = water.system.name,
-              y= 'Month',
-              x= 'Max Withdrawal')
+              y= 'Max Withdrawal',
+              x= 'Month')
+combined.plot
 ```
 
 
@@ -171,8 +176,16 @@ ggplot(df_combined, aes(x= Month, y= Max_Withdrawals)) +
 
 ```{r fetch.and.plot.Asheville.multiyear.data}
 #9
-the_PSWID<- '01-11-010'
-the_years <- 
+Year <- c(2010,2011,2012,2013,2014,2015,2016,2017,2018,2019)
+pswid <- "01-10-010"
+df_many_years <- map2(pswid, Year, scrape.it) %>%
+bind_rows(df_many_years)
+
+asheville.plot<- ggplot(df_many_years, aes(y= Max.withdrawals, x= as.factor(Month))) +
+  geom_point() +
+  geom_smooth(method="loess",se=FALSE) +
+  labs(x= "Month", y= "Max Daily Withdrawals", title = "Max Daily Withdrawal from 2010-2019 in Asheville")
+asheville.plot
 
 ```
 
