@@ -176,17 +176,16 @@ combined.plot
 ```{r fetch.and.plot.Asheville.multiyear.data}
 #9
 the_Years <- rep(2010:2019)
-the_PWSID <- rep('01-10-010', length(the_Years))
+the_PWSID <- rep('01-11-010', length(the_Years))
 df_many_years<- map2(the_PWSID, the_Years, scrape.it) %>%
   bind_rows()
 
-asheville.plot<- ggplot(df_many_years, aes(y= Max.withdrawals, x= Month)) +
+asheville.plot<- ggplot(df_many_years, aes(x= Month, y= Max.withdrawals, group =2)) +
   geom_line() +
-  #geom_smooth(method="loess",se=FALSE) +
   labs(x= "Month", y= "Max Daily Withdrawals", title = "Max Daily Withdrawal from 2010-2019 in Asheville")
 asheville.plot
 
 ```
 
 >Question: Just by looking at the plot (i.e. not running statistics), does Asheville have a trend in water usage over time?
-> 
+> The graph indicates there may be a slight upward trend in Asheville's water usage over time.
